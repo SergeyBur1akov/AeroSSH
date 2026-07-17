@@ -16,7 +16,6 @@ import com.companyname.aerossh.databinding.ActivityTerminalBinding
 import com.companyname.aerossh.security.LuksEncryption
 import com.companyname.aerossh.security.SecurityManager
 import com.companyname.aerossh.security.VaultLockManager
-import com.companyname.aerossh.security.VaultLockManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -78,7 +77,7 @@ class TerminalActivity : AppCompatActivity() {
         binding.keyPgUp.setOnClickListener { activeSsh()?.sendKey(SshService.KEY_PGUP) }; binding.keyPgDn.setOnClickListener { activeSsh()?.sendKey(SshService.KEY_PGDN) }
         binding.keyTab.setOnClickListener { activeSsh()?.sendKey(SshService.KEY_TAB) }; binding.keyEsc.setOnClickListener { activeSsh()?.sendKey(SshService.KEY_ESC) }
         binding.keyCtrl.setOnClickListener { ctrlMode = !ctrlMode; binding.keyCtrl.alpha = if (ctrlMode) 1.0f else 0.6f }
-        binding.inputField.setOnKeyListener { _, kc, ev -> if (ctrlMode && ev.action == android.view.KeyEvent.ACTION_DOWN) { val ch = ev.UnicodeChar; if (ch in 'a'.code..'z'.code || ch in 'A'.code..'Z'.code) { activeSsh()?.sendCtrlChar(ch.toChar()); return@setOnKeyListener true } }; false }
+        binding.inputField.setOnKeyListener { _, kc, ev -> if (ctrlMode && ev.action == android.view.KeyEvent.ACTION_DOWN) { val ch = ev.unicodeChar; if (ch in 'a'.code..'z'.code || ch in 'A'.code..'Z'.code) { activeSsh()?.sendCtrlChar(ch.toChar()); return@setOnKeyListener true } }; false }
     }
 
     private fun setupSymbolKeys() { val sm = mapOf(R.id.symPipe to "|", R.id.symSlash to "/", R.id.symBackslash to "\\", R.id.symDash to "-", R.id.symUnderscore to "_", R.id.symTilde to "~", R.id.symAt to "@", R.id.symDot to ".", R.id.symColon to ":"); for ((id, c) in sm) findViewById<View>(id)?.setOnClickListener { binding.inputField.append(c) }; binding.symCtrlC.setOnClickListener { activeSsh()?.sendCtrlChar('c') }; binding.symCtrlD.setOnClickListener { activeSsh()?.sendCtrlChar('d') }; binding.symCtrlZ.setOnClickListener { activeSsh()?.sendCtrlChar('z') }; binding.symCtrlL.setOnClickListener { activeSsh()?.sendCtrlChar('l') } }

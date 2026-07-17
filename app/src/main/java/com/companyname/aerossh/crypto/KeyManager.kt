@@ -1,7 +1,7 @@
 package com.companyname.aerossh.crypto
 
-import net.schmizz.sshj.common.KeyType
-import net.schmizz.sshj.userauth.keyprovider.OpenSSHKeyFile
+import com.hierynomus.sshj.common.KeyType
+import com.hierynomus.sshj.userauth.keyprovider.OpenSSHKeyFile
 import java.security.KeyPairGenerator
 import java.security.interfaces.RSAPublicKey
 import android.util.Base64
