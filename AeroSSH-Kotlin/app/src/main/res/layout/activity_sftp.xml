@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:orientation="vertical" android:layout_width="match_parent" android:layout_height="match_parent" android:background="#FF0D1117">
+    <LinearLayout android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="48dp" android:background="#FF161B22" android:gravity="center_vertical" android:paddingHorizontal="12dp">
+        <ImageButton android:id="@+id/btnBack" android:layout_width="36dp" android:layout_height="36dp" android:background="?attr/selectableItemBackgroundBorderless" android:src="@android:drawable/ic_menu_revert" android:scaleType="centerInside" android:tint="#FF8B949E" />
+        <TextView android:id="@+id/titleText" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="SFTP Browser" android:textSize="16sp" android:textStyle="bold" android:textColor="#FFE6EDF3" android:gravity="center" android:layout_marginHorizontal="8dp" />
+        <ImageButton android:id="@+id/btnNewFolder" android:layout_width="36dp" android:layout_height="36dp" android:background="?attr/selectableItemBackgroundBorderless" android:src="@android:drawable/ic_menu_add" android:scaleType="centerInside" android:tint="#FF8B949E" />
+        <ImageButton android:id="@+id/btnRefresh" android:layout_width="36dp" android:layout_height="36dp" android:background="?attr/selectableItemBackgroundBorderless" android:src="@android:drawable/ic_menu_rotate" android:scaleType="centerInside" android:tint="#FF8B949E" android:layout_marginStart="4dp" />
+    </LinearLayout>
+    <HorizontalScrollView android:layout_width="match_parent" android:layout_height="wrap_content" android:background="#FF21262D" android:scrollbars="none" android:paddingVertical="6dp" android:paddingHorizontal="12dp">
+        <TextView android:id="@+id/pathText" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textSize="13sp" android:textColor="#FF58A6FF" android:fontFamily="monospace" android:singleLine="true" />
+    </HorizontalScrollView>
+    <androidx.recyclerview.widget.RecyclerView android:id="@+id/fileList" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:clipToPadding="false" />
+    <LinearLayout android:id="@+id/emptyState" android:orientation="vertical" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:gravity="center" android:visibility="gone">
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="📂" android:textSize="48sp" />
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Empty directory" android:textSize="16sp" android:textColor="#FF8B949E" android:layout_marginTop="8dp" />
+    </LinearLayout>
+    <LinearLayout android:id="@+id/transferBar" android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content" android:background="#FF161B22" android:padding="12dp" android:gravity="center_vertical" android:visibility="gone">
+        <ProgressBar android:id="@+id/progressBar" style="@android:style/Widget.ProgressBar.Horizontal" android:layout_width="0dp" android:layout_height="4dp" android:layout_weight="1" android:progressTint="#FF58A6FF" android:progressBackgroundTint="#FF30363D" />
+        <TextView android:id="@+id/transferText" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textSize="12sp" android:textColor="#FF8B949E" android:layout_marginStart="8dp" android:fontFamily="monospace" />
+    </LinearLayout>
+    <LinearLayout android:id="@+id/actionBar" android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="48dp" android:background="#FF161B22" android:gravity="center" android:paddingHorizontal="16dp" android:visibility="gone">
+        <Button android:id="@+id/btnDownload" style="@style/Widget.MaterialComponents.Button.TextButton" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="↓ Download" android:textColor="#FF58A6FF" />
+        <Button android:id="@+id/btnDelete" style="@style/Widget.MaterialComponents.Button.TextButton" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="🗑 Delete" android:textColor="#FFF85149" />
+        <Button android:id="@+id/btnRename" style="@style/Widget.MaterialComponents.Button.TextButton" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="✏ Rename" android:textColor="#FF8B949E" />
+    </LinearLayout>
+</LinearLayout>

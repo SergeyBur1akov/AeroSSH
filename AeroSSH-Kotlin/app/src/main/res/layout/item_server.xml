@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center_vertical" android:paddingHorizontal="16dp" android:layout_marginBottom="8dp" android:background="@color/bg_secondary">
+    <LinearLayout android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="match_parent" android:padding="16dp" android:background="@color/bg_primary" android:gravity="center_vertical">
+        <View android:layout_width="8dp" android:layout_height="8dp" android:background="@drawable/status_dot" android:layout_marginEnd="12dp" />
+        <LinearLayout android:orientation="vertical" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1">
+            <TextView android:id="@+id/serverName" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textSize="16sp" android:textStyle="bold" android:textColor="@color/text_primary" android:ellipsize="end" android:maxLines="1" />
+            <TextView android:id="@+id/serverHost" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textSize="13sp" android:textColor="@color/text_secondary" android:fontFamily="monospace" android:layout_marginTop="2dp" />
+        </LinearLayout>
+        <TextView android:id="@+id/serverTag" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textSize="10sp" android:textColor="#FF58A6FF" android:background="@drawable/tag_bg" android:paddingHorizontal="8dp" android:paddingVertical="2dp" android:visibility="gone" />
+        <View android:id="@+id/connectionIndicator" android:layout_width="8dp" android:layout_height="8dp" android:background="#FF30363D" android:layout_marginStart="8dp" />
+    </LinearLayout>
+</LinearLayout>

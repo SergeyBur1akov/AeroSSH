@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto" android:orientation="vertical" android:layout_width="match_parent" android:layout_height="match_parent" android:background="#FF0D1117">
+    <LinearLayout android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center_vertical" android:paddingHorizontal="20dp" android:paddingTop="16dp" android:paddingBottom="12dp">
+        <LinearLayout android:orientation="vertical" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1">
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="AeroSSH" android:textSize="28sp" android:textStyle="bold" android:textColor="#FFE6EDF3" android:fontFamily="sans-serif-medium" android:letterSpacing="0.08" />
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Secure Shell Client" android:textSize="13sp" android:textColor="#FF8B949E" />
+        </LinearLayout>
+        <ImageButton android:id="@+id/btnImport" android:layout_width="40dp" android:layout_height="40dp" android:layout_marginEnd="8dp" android:background="?attr/selectableItemBackgroundBorderless" android:src="@android:drawable/ic_menu_upload" android:scaleType="centerInside" android:tint="#FF8B949E" />
+        <ImageButton android:id="@+id/btnSettings" android:layout_width="40dp" android:layout_height="40dp" android:layout_marginEnd="8dp" android:background="?attr/selectableItemBackgroundBorderless" android:src="@android:drawable/ic_menu_manage" android:scaleType="centerInside" android:tint="#FF8B949E" />
+        <com.google.android.material.floatingactionbutton.FloatingActionButton android:id="@+id/fabAdd" android:layout_width="wrap_content" android:layout_height="wrap_content" android:src="@android:drawable/ic_menu_add" android:backgroundTint="#FF58A6FF" android:tint="#FF0D1117" />
+    </LinearLayout>
+    <com.google.android.material.textfield.TextInputLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginHorizontal="16dp" android:layout_marginBottom="8dp" android:hint="Search servers..." app:hintTextColor="#FF484F58" app:boxBackgroundColor="#FF161B22" app:boxCornerRadiusTopStart="12dp" app:boxCornerRadiusTopEnd="12dp" app:boxCornerRadiusBottomStart="12dp" app:boxCornerRadiusBottomEnd="12dp" app:startIconDrawable="@android:drawable/ic_menu_search" app:startIconTint="#FF484F58">
+        <com.google.android.material.textfield.TextInputEditText android:id="@+id/searchEdit" android:layout_width="match_parent" android:layout_height="wrap_content" android:textColor="#FFE6EDF3" android:textColorHint="#FF484F58" android:inputType="text" android:maxLines="1" />
+    </com.google.android.material.textfield.TextInputLayout>
+    <LinearLayout android:id="@+id/emptyState" android:orientation="vertical" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:gravity="center" android:visibility="gone">
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="🖥️" android:textSize="48sp" android:layout_marginBottom="12dp" />
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="No saved servers" android:textSize="18sp" android:textColor="#FF8B949E" android:layout_marginBottom="4dp" />
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Tap + to add your first server" android:textSize="14sp" android:textColor="#FF484F58" />
+    </LinearLayout>
+    <androidx.recyclerview.widget.RecyclerView android:id="@+id/serverList" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:clipToPadding="false" android:paddingVertical="8dp" />
+    <LinearLayout android:id="@+id/quickConnectSection" android:orientation="vertical" android:layout_width="match_parent" android:layout_height="wrap_content" android:background="#FF161B22" android:padding="16dp" android:visibility="gone">
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Quick Connect" android:textSize="13sp" android:textColor="#FF8B949E" android:layout_marginBottom="8dp" />
+        <LinearLayout android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content">
+            <EditText android:id="@+id/quickHostEdit" android:layout_width="0dp" android:layout_height="48dp" android:layout_weight="3" android:layout_marginEnd="8dp" android:background="@drawable/edit_text_dark" android:hint="Host" android:textColorHint="#FF484F58" android:textColor="#FFE6EDF3" android:textSize="14sp" android:paddingHorizontal="12dp" android:singleLine="true" android:inputType="text" />
+            <EditText android:id="@+id/quickUserEdit" android:layout_width="0dp" android:layout_height="48dp" android:layout_weight="2" android:layout_marginEnd="8dp" android:background="@drawable/edit_text_dark" android:hint="User" android:textColorHint="#FF484F58" android:textColor="#FFE6EDF3" android:textSize="14sp" android:paddingHorizontal="12dp" android:singleLine="true" android:inputType="text" />
+            <Button android:id="@+id/quickConnectBtn" android:layout_width="wrap_content" android:layout_height="48dp" android:text="⚡" android:textSize="18sp" android:backgroundTint="#FF58A6FF" android:minWidth="48dp" />
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>
