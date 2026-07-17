@@ -41,6 +41,7 @@ object LuksEncryption {
 
     fun isVaultInitialized(context: Context): Boolean = try { getSecurePrefs(context).getBoolean("vault_initialized", false) } catch (_: Exception) { false }
     fun isVaultUnlocked(): Boolean = masterKey != null
+    fun lockVault() { masterKey = null }
     fun isMinPasswordLength(): Int = MIN_PASSWORD_LENGTH
 
     fun changePassword(context: Context, oldP: String, newP: String): Boolean { require(newP.length >= MIN_PASSWORD_LENGTH); if (!unlockVault(context, oldP)) return false; setupVault(context, newP); return true }

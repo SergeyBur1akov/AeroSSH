@@ -14,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.companyname.aerossh.databinding.ActivityTerminalBinding
 import com.companyname.aerossh.security.LuksEncryption
+import com.companyname.aerossh.security.VaultLockManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -91,6 +92,8 @@ class TerminalActivity : AppCompatActivity() {
         binding.keyTab.setOnTouchListener(hl); binding.keyEsc.setOnTouchListener(hl); binding.keyCtrl.setOnTouchListener(hl)
     }
 
+    override fun onResume() { super.onResume(); VaultLockManager.onActivityResumed(this) }
+    override fun onStop() { super.onStop(); VaultLockManager.onActivityStopped(this) }
     override fun onDestroy() { super.onDestroy(); sessions.forEach { it.ssh?.close(); it.pass.fill('\u0000') }; sessions.clear() }
 
     companion object { const val EXTRA_HOST = "host"; const val EXTRA_PORT = "port"; const val EXTRA_USER = "user"; const val EXTRA_PASS = "pass"

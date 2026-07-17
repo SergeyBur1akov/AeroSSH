@@ -19,6 +19,7 @@ import com.companyname.aerossh.databinding.ActivityMainBinding
 import com.companyname.aerossh.ui.ServerAdapter
 import com.companyname.aerossh.crypto.BiometricHelper
 import com.companyname.aerossh.security.SecurityManager
+import com.companyname.aerossh.security.VaultLockManager
 import com.companyname.aerossh.ui.ServerDialogFragment
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -67,4 +68,7 @@ class MainActivity : AppCompatActivity() {
     private fun showEditDialog(server: Server) { ServerDialogFragment(server) { lifecycleScope.launch { repo.update(it); Toast.makeText(this@MainActivity, "Server updated", Toast.LENGTH_SHORT).show() } }.show(supportFragmentManager, ServerDialogFragment.TAG) }
     private fun deleteServer(server: Server) { lifecycleScope.launch { repo.delete(server); Toast.makeText(this@MainActivity, "Server deleted", Toast.LENGTH_SHORT).show() } }
     private fun connectToServer(server: Server) { lifecycleScope.launch { repo.touchLastConnected(server.id) }; TerminalActivity.start(this, server.host, server.port, server.username, server.password) }
+
+    override fun onResume() { super.onResume(); VaultLockManager.onActivityResumed(this) }
+    override fun onStop() { super.onStop(); VaultLockManager.onActivityStopped(this) }
 }

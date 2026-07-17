@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.companyname.aerossh.databinding.ActivitySftpBinding
 import com.companyname.aerossh.sftp.SftpService
 import com.companyname.aerossh.security.LuksEncryption
+import com.companyname.aerossh.security.VaultLockManager
 import com.companyname.aerossh.ui.SftpAdapter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -55,6 +56,8 @@ class SftpActivity : AppCompatActivity() {
 
     private fun renameSelected() { val e = selectedEntry ?: return; val input = EditText(this).apply { setText(e.name); setPadding(48, 32, 48, 32) }; AlertDialog.Builder(this).setTitle("Rename").setView(input).setPositiveButton("Rename") { _, _ -> val n = input.text.toString().trim(); if (n.isNotEmpty() && n != e.name) lifecycleScope.launch { withContext(Dispatchers.IO) { sftp?.rename(e.path, "$currentPath/$n") }; selectedEntry = null; binding.actionBar.visibility = View.GONE; listFiles() } }.setNegativeButton("Cancel", null).show() }
 
+    override fun onResume() { super.onResume(); VaultLockManager.onActivityResumed(this) }
+    override fun onStop() { super.onStop(); VaultLockManager.onActivityStopped(this) }
     override fun onDestroy() { super.onDestroy(); sftp?.close() }
     companion object { const val EXTRA_HOST = "host"; const val EXTRA_PORT = "port"; const val EXTRA_USER = "user"; const val EXTRA_PASS = "pass"
         fun start(context: Context, host: String, port: Int, user: String, pass: String) { val ep = try { LuksEncryption.encryptWithMaster(pass) } catch (_: Exception) { return }; context.startActivity(Intent(context, SftpActivity::class.java).apply { putExtra(EXTRA_HOST, host); putExtra(EXTRA_PORT, port); putExtra(EXTRA_USER, user); putExtra(EXTRA_PASS, ep) }) }

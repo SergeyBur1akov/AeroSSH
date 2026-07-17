@@ -1,6 +1,7 @@
 package com.companyname.aerossh
 
 import android.os.Bundle
+import com.companyname.aerossh.security.VaultLockManager
 import android.view.MenuItem
 import android.widget.SeekBar
 import android.widget.Toast
@@ -61,6 +62,8 @@ class SettingsActivity : AppCompatActivity() {
         withContext(Dispatchers.IO) { ef.bufferedWriter().use { w -> files.sortedByDescending { it.name }.forEach { w.write("=== ${it.name} ===\n"); w.write(it.readText()); w.write("\n\n") } } }
         startActivity(android.content.Intent(android.content.Intent.ACTION_SEND).apply { type = "text/plain"; putExtra(android.content.Intent.EXTRA_STREAM, FileProvider.getUriForFile(this@SettingsActivity, "${packageName}.fileprovider", ef)); addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION) }.let { android.content.Intent.createChooser(it, "Export logs") }) } catch (e: Exception) { Toast.makeText(this@SettingsActivity, "Export failed", Toast.LENGTH_SHORT).show() } } }
 
+    override fun onResume() { super.onResume(); VaultLockManager.onActivityResumed(this) }
+    override fun onStop() { super.onStop(); VaultLockManager.onActivityStopped(this) }
     override fun onOptionsItemSelected(item: MenuItem) = if (item.itemId == android.R.id.home) { finish(); true } else super.onOptionsItemSelected(item)
 
     private fun themeModeToIndex(m: String) = when (m) { "dark" -> 0; "oled" -> 1; "light" -> 2; else -> 0 }
