@@ -187,4 +187,4 @@ cd AeroSSH
 
 ## Лицензия
 
-MIT License
+Apache License 2.0
