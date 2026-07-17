@@ -8,14 +8,12 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import java.util.concurrent.ConcurrentLinkedQueue
-import javax.crypto.SecretKey
-import javax.crypto.SecretKeySpec
 
 class SessionLogger(private val context: Context) {
     private var logFile: File? = null; private var outputStream: FileOutputStream? = null
     private val buffer = ConcurrentLinkedQueue<String>()
     private val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())
-    private var encryptionKey: SecretKey? = null; private var isActive = false
+    private var encryptionKey: javax.crypto.SecretKey? = null; private var isActive = false
 
     fun start(sessionId: String, encrypted: Boolean = true) {
         val logDir = File(context.filesDir, "logs"); logDir.mkdirs()
@@ -23,7 +21,7 @@ class SessionLogger(private val context: Context) {
         if (encrypted) {
             if (!LuksEncryption.isVaultUnlocked()) { isActive = false; return }
             val kb = ByteArray(32); SecureRandom().nextBytes(kb)
-            encryptionKey = SecretKeySpec(kb, "AES")
+            encryptionKey = javax.crypto.SecretKeySpec(kb, "AES")
             val encryptedKey: String = try { LuksEncryption.encryptWithMaster(android.util.Base64.encodeToString(kb, android.util.Base64.NO_WRAP)) } catch (_: Exception) { "" }
             kb.fill(0)
             if (encryptedKey.isNotEmpty()) File(logDir, "${logFile!!.name}.key").writeText(encryptedKey)
@@ -42,9 +40,9 @@ class SessionLogger(private val context: Context) {
         val file = logFile ?: return null; val ef = File(context.cacheDir, "export_${file.nameWithoutExtension}.txt")
         return try {
             val kf = File(file.parent, "${file.name}.key")
-            val key: SecretKey? = if (kf.exists()) {
+            val key: javax.crypto.SecretKey? = if (kf.exists()) {
                 val decryptedKey = try { LuksEncryption.decryptWithMaster(kf.readText().trim()) } catch (_: Exception) { "" }
-                if (decryptedKey.isNotEmpty()) { val kb = android.util.Base64.decode(decryptedKey, android.util.Base64.NO_WRAP); SecretKeySpec(kb, "AES").also { kb.fill(0) } } else null
+                if (decryptedKey.isNotEmpty()) { val kb = android.util.Base64.decode(decryptedKey, android.util.Base64.NO_WRAP); javax.crypto.SecretKeySpec(kb, "AES").also { kb.fill(0) } } else null
             } else null
             ef.bufferedWriter().use { w -> file.readLines().forEach { line -> key?.let { try { w.write(String(SecurityManager.decrypt(line.trim(), it), Charsets.UTF_8)) } catch (_: Exception) { w.write("[encrypted]") } } ?: w.write(line); w.newLine() } }; ef
         } catch (_: Exception) { null }

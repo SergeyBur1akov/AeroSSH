@@ -36,7 +36,7 @@ object SecurityManager {
         val cm = context.getSystemService(Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
         cm.addPrimaryClipChangedListener {
             clipboardClearRunnable?.let { android.os.Handler(android.os.Looper.getMainLooper()).removeCallbacks(it) }
-            clipboardClearRunnable = Runnable { cm.setPrimaryClip(null) }
+            @Suppress("DEPRECATION") clipboardClearRunnable = Runnable { cm.primaryClip = null }
             android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(clipboardClearRunnable!!, delayMs)
         }
     }

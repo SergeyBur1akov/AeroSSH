@@ -1,7 +1,7 @@
 package com.companyname.aerossh.sftp
 
-import com.hierynomus.sshj.SSHClient
-import com.hierynomus.sshj.sftp.SFTPClient
+import net.schmizz.sshj.SSHClient
+import net.schmizz.sshj.sftp.SFTPClient
 import java.io.Closeable
 import java.io.IOException
 import java.io.InputStream

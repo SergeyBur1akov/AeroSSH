@@ -2,9 +2,9 @@ package com.companyname.aerossh
 
 import android.content.Context
 import com.companyname.aerossh.crypto.HostKeyManager
-import com.hierynomus.sshj.SSHClient
-import com.hierynomus.sshj.connection.channel.direct.Session
-import com.hierynomus.sshj.transport.verification.HostKeyVerifier
+import net.schmizz.sshj.SSHClient
+import net.schmizz.sshj.connection.channel.direct.Session
+import net.schmizz.sshj.transport.verification.HostKeyVerifier
 import java.io.Closeable
 import java.io.IOException
 import java.io.InputStream
@@ -31,9 +31,10 @@ class SshService(private val host: String, private val port: Int, private val us
                 hostKeyStatus.set(HostKeyStatus.UNKNOWN); return false
             }
         }
-        val c = SSHClient(com.hierynomus.sshj.transport.TransportConfig().apply { setTimeout(timeout.toLong()) })
-        c.addHostKeyVerifier(verifier)
-        c.connect(host, port); c.authPassword(username, String(password))
+        val c = SSHClient().apply {
+            addHostKeyVerifier(verifier)
+            connect(host, port); setTimeout(timeout * 1000L); authPassword(username, password)
+        }
         client = c; connected.set(true)
     }
 
@@ -46,13 +47,14 @@ class SshService(private val host: String, private val port: Int, private val us
                 hostKeyStatus.set(HostKeyStatus.KNOWN); return true
             }
         }
-        val c = SSHClient()
-        c.addHostKeyVerifier(verifier)
-        c.connect(host, port); c.authPassword(username, String(password))
+        val c = SSHClient().apply {
+            addHostKeyVerifier(verifier)
+            connect(host, port); authPassword(username, password)
+        }
         client = c; connected.set(true)
     }
 
-    fun getHostKeyInfo(): Pair<String, String> { val sk = client?.transport?.serverHostKeyAlgorithm ?: return "" to ""; return sk to hostKeyFingerprint }
+    fun getHostKeyInfo(): Pair<String, String> { val sk = client?.hostKeyEntry?.key ?: return "" to ""; return sk.algorithm to computeFingerprint(sk) }
     fun getClient(): SSHClient = client ?: throw IllegalStateException("Not connected")
     private fun computeFingerprint(key: PublicKey): String { val h = MessageDigest.getInstance("SHA-256").digest(key.encoded); return Base64.encodeToString(h, Base64.NO_WRAP) }
 
@@ -61,6 +63,7 @@ class SshService(private val host: String, private val port: Int, private val us
         val s = c.startSession().apply { allocateDefaultPTY(); startShell() }
         session = s; shellIn = s.inputStream; shellOut = s.outputStream
         Thread { try { val buf = ByteArray(4096); while (connected.get()) { val n = shellIn?.read(buf) ?: break; if (n == -1) break; val copy = buf.copyOf(n); onOutput(copy); copy.fill(0) } } catch (_: IOException) { connected.set(false); onError("Connection lost") } }.apply { isDaemon = true; name = "ssh-reader" }.start()
+        Thread { try { val buf = ByteArray(1024); val es = s.extendedOutputStream; while (connected.get()) { val n = es.read(buf); if (n == -1) break; onError(String(buf, 0, n, Charsets.UTF_8)) } } catch (_: IOException) {} }.apply { isDaemon = true; name = "ssh-stderr" }.start()
     }
 
     fun send(data: ByteArray) { try { shellOut?.write(data); shellOut?.flush() } catch (_: IOException) {} }
