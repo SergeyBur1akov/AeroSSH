@@ -58,8 +58,8 @@ class SettingsActivity : AppCompatActivity() {
         view.findViewById<android.widget.Button>(R.id.btnCancelDialog).setOnClickListener { dialog.dismiss() }; dialog.show()
     }
 
-    private fun exportLogs() { lifecycleScope.launch { try { val ld = File(filesDir, "logs"); if (!ld.exists()) { Toast.makeText(this@SettingsActivity, "No logs", Toast.LENGTH_SHORT).show(); return@launch }; val files = ld.listFiles() ?: emptyArray(); if (files.isEmpty()) { Toast.makeText(this@SettingsActivity, "No logs", Toast.LENGTH_SHORT).show(); return@launch }; val ef = File(cacheDir, "logs_${SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())}.txt")
-        withContext(Dispatchers.IO) { ef.bufferedWriter().use { w -> files.sortedByDescending { it.name }.forEach { w.write("=== ${it.name} ===\n"); w.write(it.readText()); w.write("\n\n") } } }
+    private fun exportLogs() { lifecycleScope.launch { try { val ld = File(filesDir, "logs"); if (!ld.exists()) { Toast.makeText(this@SettingsActivity, "No logs", Toast.LENGTH_SHORT).show(); return@launch }; val files = (ld.listFiles() ?: emptyArray()).filter { !it.name.endsWith(".key") }; if (files.isEmpty()) { Toast.makeText(this@SettingsActivity, "No logs", Toast.LENGTH_SHORT).show(); return@launch }; val ef = File(cacheDir, "logs_${SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())}.txt")
+        withContext(Dispatchers.IO) { ef.bufferedWriter().use { w -> files.sortedByDescending { it.name }.forEach { if (!it.name.endsWith(".key")) { w.write("=== ${it.name} ===\n"); w.write(it.readText()); w.write("\n\n") } } } }
         startActivity(android.content.Intent(android.content.Intent.ACTION_SEND).apply { type = "text/plain"; putExtra(android.content.Intent.EXTRA_STREAM, FileProvider.getUriForFile(this@SettingsActivity, "${packageName}.fileprovider", ef)); addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION) }.let { android.content.Intent.createChooser(it, "Export logs") }) } catch (e: Exception) { Toast.makeText(this@SettingsActivity, "Export failed", Toast.LENGTH_SHORT).show() } } }
 
     override fun onResume() { super.onResume(); VaultLockManager.onActivityResumed(this) }

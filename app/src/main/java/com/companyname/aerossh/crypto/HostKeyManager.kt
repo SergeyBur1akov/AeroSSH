@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
 import java.security.MessageDigest
-import java.util.Base64
+import android.util.Base64
 
 object HostKeyManager {
     private const val PREFS = "known_hosts_encrypted"; private const val KEY_SEPARATOR = "|"
@@ -15,6 +15,6 @@ object HostKeyManager {
     fun saveHost(context: Context, host: String, port: Int, keyType: String, fingerprint: String) { getEncryptedPrefs(context).edit().putString("$host:$port", "$keyType$KEY_SEPARATOR$fingerprint").apply() }
     fun removeHost(context: Context, host: String, port: Int) { getEncryptedPrefs(context).edit().remove("$host:$port").apply() }
     fun getAllKnown(context: Context): Map<String, String> = getEncryptedPrefs(context).all.mapValues { it.value.toString() }
-    fun computeFingerprint(pubKeyBytes: ByteArray): String = Base64.getEncoder().encodeToString(MessageDigest.getInstance("SHA-256").digest(pubKeyBytes))
-    fun computeFingerprintFromOpenSSH(pubKeyStr: String): String { val parts = pubKeyStr.trim().split("\\s+".toRegex()); if (parts.size < 2) return ""; return computeFingerprint(Base64.getDecoder().decode(parts[1])) }
+    fun computeFingerprint(pubKeyBytes: ByteArray): String = Base64.encodeToString(MessageDigest.getInstance("SHA-256").digest(pubKeyBytes), Base64.NO_WRAP)
+    fun computeFingerprintFromOpenSSH(pubKeyStr: String): String { val parts = pubKeyStr.trim().split("\\s+".toRegex()); if (parts.size < 2) return ""; return computeFingerprint(Base64.decode(parts[1], Base64.DEFAULT)) }
 }

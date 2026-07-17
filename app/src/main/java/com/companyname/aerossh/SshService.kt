@@ -10,7 +10,7 @@ import java.io.InputStream
 import java.io.OutputStream
 import java.security.MessageDigest
 import java.security.PublicKey
-import java.util.Base64
+import android.util.Base64
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicReference
 
@@ -41,7 +41,8 @@ class SshService(private val host: String, private val port: Int, private val us
     }
 
     fun getHostKeyInfo(): Pair<String, String> { val sk = client?.hostKeyEntry?.key ?: return "" to ""; return sk.algorithm to computeFingerprint(sk) }
-    private fun computeFingerprint(key: PublicKey): String { val h = MessageDigest.getInstance("SHA-256").digest(key.encoded); return Base64.getEncoder().encodeToString(h) }
+    fun getClient(): SSHClient = client ?: throw IllegalStateException("Not connected")
+    private fun computeFingerprint(key: PublicKey): String { val h = MessageDigest.getInstance("SHA-256").digest(key.encoded); return Base64.encodeToString(h, Base64.NO_WRAP) }
 
     fun openShell(onOutput: (ByteArray) -> Unit, onError: (String) -> Unit) {
         val c = client ?: throw IllegalStateException("Not connected")

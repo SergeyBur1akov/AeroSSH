@@ -20,6 +20,7 @@ class DecryptAnimationView @JvmOverloads constructor(context: Context, attrs: At
     private val textPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { textSize = 28f; color = Color.parseColor("#8B949E"); textAlign = Paint.Align.CENTER; typeface = Typeface.MONOSPACE }
     private val lockPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { textSize = 72f; textAlign = Paint.Align.CENTER; color = Color.WHITE }
     private val scanPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.FILL; shader = LinearGradient(0f, 0f, 0f, 20f, intArrayOf(Color.TRANSPARENT, Color.parseColor("#3058A6FF"), Color.TRANSPARENT), floatArrayOf(0f, 0.5f, 1f), Shader.TileMode.CLAMP) }
+    private val arcPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.STROKE; strokeWidth = 3f; strokeCap = Paint.Cap.ROUND; color = Color.parseColor("#58A6FF"); alpha = 150 }
 
     private var rotation = 0f
     private var pulse = 0f
@@ -61,7 +62,7 @@ class DecryptAnimationView @JvmOverloads constructor(context: Context, attrs: At
         rotation += 3f
         pulse = (sin(fraction * Math.PI * 6).toFloat() + 1f) / 2f
         hexPhase += 0.03f
-        scanY = (scanY + 3f) % height
+        scanY = if (height > 0) (scanY + 3f) % height else 0f
         particleAngle += 2f
         dotsAlpha = (sin(fraction * Math.PI * 4).toFloat() + 1f) / 2f
         progress = fraction
@@ -141,11 +142,8 @@ class DecryptAnimationView @JvmOverloads constructor(context: Context, attrs: At
     }
 
     private fun drawProgressArc(canvas: Canvas, cx: Float, cy: Float, r: Float) {
-        val arcPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-            style = Paint.Style.STROKE; strokeWidth = 3f; strokeCap = Paint.Cap.ROUND
-            color = Color.parseColor("#58A6FF"); alpha = 150
-        }
         val rect = RectF(cx - r - 30, cy - r - 30, cx + r + 30, cy + r + 30)
+        arcPaint.alpha = 150; arcPaint.strokeWidth = 3f
         canvas.drawArc(rect, rotation, 120f, false, arcPaint)
         arcPaint.alpha = 80; arcPaint.strokeWidth = 2f
         canvas.drawArc(rect, -rotation, 80f, false, arcPaint)
@@ -158,7 +156,7 @@ class DecryptAnimationView @JvmOverloads constructor(context: Context, attrs: At
     }
 
     private fun drawDecryptText(canvas: Canvas, cx: Float, cy: Float, r: Float) {
-        val dots = ".".repeat((progress * 6 % 3).toInt() + 1)
+        val dots = ".".repeat((progress * 9 % 3).toInt() + 1)
         textPaint.textSize = 26f
         canvas.drawText("DECRYPTING$dots", cx, cy + r + 50, textPaint)
     }

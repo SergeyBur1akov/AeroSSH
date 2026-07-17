@@ -26,7 +26,7 @@ object SecurityManager {
 
     fun isDeviceRooted(): Boolean {
         for (path in arrayOf("/system/app/Superuser.apk", "/system/xbin/su", "/system/bin/su", "/sbin/su")) if (File(path).exists()) return true
-        return try { val p = Runtime.getRuntime().exec(arrayOf("/system/xbin/which", "su")); val r = p.inputStream.bufferedReader(); val l = r.readLine(); r.close(); l != null } catch (_: Exception) { false }
+        return try { val p = Runtime.getRuntime().exec(arrayOf("/system/xbin/which", "su")); val r = p.inputStream.bufferedReader(); val l = r.readLine(); r.close(); p.errorStream.bufferedReader().readText(); p.waitFor(); l != null } catch (_: Exception) { false }
     }
 
     fun isEmulator(): Boolean = Build.FINGERPRINT.startsWith("generic") || Build.FINGERPRINT.startsWith("unknown") || Build.HARDWARE.contains("goldfish") || Build.MODEL.contains("Emulator") || Build.PRODUCT.contains("emulator")

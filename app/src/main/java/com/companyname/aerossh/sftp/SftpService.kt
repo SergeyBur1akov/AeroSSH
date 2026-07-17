@@ -20,7 +20,14 @@ class SftpService(private val ssh: SSHClient) : Closeable {
     fun download(remotePath: String, localOut: OutputStream) { (client ?: throw IllegalStateException("Not connected")).get(remotePath, localOut) }
     fun upload(localIn: InputStream, remotePath: String) { (client ?: throw IllegalStateException("Not connected")).put(localIn, remotePath) }
     fun pwd(): String = client?.pwd() ?: "/"
-    fun resolvePath(base: String, child: String): String = if (child.startsWith("/")) child else "$base/$child".replace("//", "/")
+    fun resolvePath(base: String, child: String): String {
+        val clean = child.replace("\\", "/").replace(Regex("/+"), "/").trim('/')
+        val resolved = if (clean.startsWith("/")) clean else "$base/$clean".replace("//", "/")
+        val parts = resolved.split("/").filter { it.isNotEmpty() && it != "." }
+        val result = mutableListOf<String>()
+        for (part in parts) { if (part == "..") { if (result.isNotEmpty()) result.removeLast() } else result.add(part) }
+        return "/" + result.joinToString("/")
+    }
     override fun close() { try { client?.close() } catch (_: IOException) {} }
     data class SftpEntry(val name: String, val path: String, val isDirectory: Boolean, val size: Long = 0, val permissions: String = "", val modTime: Long = 0)
 }

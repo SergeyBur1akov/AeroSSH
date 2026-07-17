@@ -34,7 +34,7 @@ class MainActivity : AppCompatActivity() {
         if (SecurityManager.isDeviceRooted()) Toast.makeText(this, "Root detected. Security may be compromised.", Toast.LENGTH_LONG).show()
         SecurityManager.setupClipboardAutoClear(this, 30_000)
         binding = ActivityMainBinding.inflate(layoutInflater); setContentView(binding.root)
-        if (!biometricDone && BiometricHelper.isAvailable(this)) BiometricHelper.authenticate(this, "AeroSSH", "Verify to access servers", { biometricDone = true }, { biometricDone = true })
+        if (!biometricDone && BiometricHelper.isAvailable(this)) BiometricHelper.authenticate(this, "AeroSSH", "Verify to access servers", { biometricDone = true }, {}, {})
         setupList(); setupSearch(); setupFab(); setupSettings(); setupImport(); setupQuickConnect(); observeServers()
     }
 
@@ -53,7 +53,7 @@ class MainActivity : AppCompatActivity() {
         binding.serverList.layoutManager = LinearLayoutManager(this); binding.serverList.adapter = adapter
         ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
             override fun onMove(rv: RecyclerView, vh: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder) = false
-            override fun onSwiped(vh: RecyclerView.ViewHolder, dir: Int) { val s = adapter.currentList[vh.adapterPosition]; if (dir == ItemTouchHelper.LEFT) deleteServer(s) else connectToServer(s) }
+            override fun onSwiped(vh: RecyclerView.ViewHolder, dir: Int) { val pos = vh.bindingAdapterPosition; if (pos == RecyclerView.NO_POSITION) return; val s = adapter.currentList[pos]; if (dir == ItemTouchHelper.LEFT) deleteServer(s) else connectToServer(s) }
         }).attachToRecyclerView(binding.serverList)
         binding.serverList.startAnimation(AnimationUtils.loadAnimation(this, R.anim.slide_in))
     }

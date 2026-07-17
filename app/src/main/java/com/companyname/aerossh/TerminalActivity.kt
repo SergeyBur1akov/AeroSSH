@@ -14,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.companyname.aerossh.databinding.ActivityTerminalBinding
 import com.companyname.aerossh.security.LuksEncryption
+import com.companyname.aerossh.security.SecurityManager
 import com.companyname.aerossh.security.VaultLockManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -30,8 +31,9 @@ class TerminalActivity : AppCompatActivity() {
         window.setFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON, WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         com.companyname.aerossh.security.SecurityManager.preventScreenshots(this)
         binding = ActivityTerminalBinding.inflate(layoutInflater); setContentView(binding.root)
+        SecurityManager.setupClipboardAutoClear(this, 30_000)
         setupTopBar(); setupInput(); setupSpecialKeys(); setupSymbolKeys(); setupTerminal()
-        val host = intent.getStringExtra(EXTRA_HOST) ?: return; val port = intent.getIntExtra(EXTRA_PORT, 22); val user = intent.getStringExtra(EXTRA_USER) ?: return
+        val host = intent.getStringExtra(EXTRA_HOST) ?: run { finish(); return }; val port = intent.getIntExtra(EXTRA_PORT, 22); val user = intent.getStringExtra(EXTRA_USER) ?: run { finish(); return }
         val encPass = intent.getStringExtra(EXTRA_PASS) ?: ""; val pass = try { LuksEncryption.decryptWithMaster(encPass).toCharArray() } catch (_: Exception) { CharArray(0) }
         if (pass.isEmpty()) { Toast.makeText(this, "Failed to decrypt credentials", Toast.LENGTH_SHORT).show(); finish(); return }
         addSession(host, port, user, pass)

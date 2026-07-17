@@ -23,7 +23,7 @@ import java.io.File
 
 class SftpActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySftpBinding; private lateinit var adapter: SftpAdapter
-    private var sftp: SftpService? = null; private var currentPath = "/"; private val pathHistory = mutableListOf<String>(); private var selectedEntry: SftpService.SftpEntry? = null
+    private var sftp: SftpService? = null; private var sftpService: SshService? = null; private var currentPath = "/"; private val pathHistory = mutableListOf<String>(); private var selectedEntry: SftpService.SftpEntry? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState); com.companyname.aerossh.security.SecurityManager.preventScreenshots(this)
@@ -43,7 +43,7 @@ class SftpActivity : AppCompatActivity() {
         val host = intent.getStringExtra(EXTRA_HOST) ?: return; val port = intent.getIntExtra(EXTRA_PORT, 22); val user = intent.getStringExtra(EXTRA_USER) ?: return; val encPass = intent.getStringExtra(EXTRA_PASS) ?: ""
         val pass = try { LuksEncryption.decryptWithMaster(encPass).toCharArray() } catch (_: Exception) { CharArray(0) }
         if (pass.isEmpty()) { Toast.makeText(this, "Failed to decrypt", Toast.LENGTH_SHORT).show(); finish(); return }
-        lifecycleScope.launch { try { withContext(Dispatchers.IO) { val ssh = SshService(host, port, user, pass); ssh.connect(this@SftpActivity); val svc = SftpService(ssh); svc.connect(); sftp = svc; currentPath = svc.pwd() }; listFiles() } catch (_: Exception) { Toast.makeText(this@SftpActivity, "SFTP failed", Toast.LENGTH_LONG).show(); finish() } finally { pass.fill('\u0000') } }
+        lifecycleScope.launch { try { withContext(Dispatchers.IO) { val ssh = SshService(host, port, user, pass); try { ssh.connect(this@SftpActivity); val svc = SftpService(ssh.getClient()); svc.connect(); sftp = svc; sftpService = ssh; currentPath = svc.pwd() } catch (e: Exception) { ssh.close(); throw e } }; listFiles() } catch (_: Exception) { Toast.makeText(this@SftpActivity, "SFTP failed", Toast.LENGTH_LONG).show(); finish() } finally { pass.fill('\u0000') } }
     }
 
     private fun navigateTo(path: String) { currentPath = path; selectedEntry = null; adapter.setSelected(null); binding.actionBar.visibility = View.GONE; listFiles() }
@@ -58,7 +58,7 @@ class SftpActivity : AppCompatActivity() {
 
     override fun onResume() { super.onResume(); VaultLockManager.onActivityResumed(this) }
     override fun onStop() { super.onStop(); VaultLockManager.onActivityStopped(this) }
-    override fun onDestroy() { super.onDestroy(); sftp?.close() }
+    override fun onDestroy() { super.onDestroy(); sftp?.close(); sftpService?.close() }
     companion object { const val EXTRA_HOST = "host"; const val EXTRA_PORT = "port"; const val EXTRA_USER = "user"; const val EXTRA_PASS = "pass"
         fun start(context: Context, host: String, port: Int, user: String, pass: String) { val ep = try { LuksEncryption.encryptWithMaster(pass) } catch (_: Exception) { return }; context.startActivity(Intent(context, SftpActivity::class.java).apply { putExtra(EXTRA_HOST, host); putExtra(EXTRA_PORT, port); putExtra(EXTRA_USER, user); putExtra(EXTRA_PASS, ep) }) }
     }

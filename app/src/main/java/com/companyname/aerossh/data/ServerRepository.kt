@@ -14,6 +14,6 @@ class ServerRepository(private val dao: ServerDao) {
     suspend fun touchLastConnected(id: Long) = dao.touchLastConnected(id)
     suspend fun getRecent(limit: Int = 5): List<Server> = dao.getRecent(limit).map { it.decryptPassword() }
 
-    private fun Server.encryptPassword(): Server = if (password.isEmpty()) this else try { copy(password = LuksEncryption.encryptWithMaster(password)) } catch (_: Exception) { this }
-    private fun Server.decryptPassword(): Server = if (password.isEmpty()) this else try { copy(password = LuksEncryption.decryptWithMaster(password)) } catch (_: Exception) { this }
+    private fun Server.encryptPassword(): Server = if (password.isEmpty()) this else copy(password = LuksEncryption.encryptWithMaster(password))
+    private fun Server.decryptPassword(): Server = if (password.isEmpty()) this else copy(password = LuksEncryption.decryptWithMaster(password))
 }

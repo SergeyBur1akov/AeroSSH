@@ -19,7 +19,13 @@ class SessionLogger(private val context: Context) {
     fun start(sessionId: String, encrypted: Boolean = true) {
         val logDir = File(context.filesDir, "logs"); logDir.mkdirs()
         logFile = File(logDir, "session_${sessionId}_$timestamp.aeslog")
-        if (encrypted) { val kb = ByteArray(32); SecureRandom().nextBytes(kb); encryptionKey = SecretKeySpec(kb, "AES"); File(logDir, "${logFile!!.name}.key").writeText(android.util.Base64.encodeToString(kb, android.util.Base64.NO_WRAP)); kb.fill(0) }
+        if (encrypted) {
+            val kb = ByteArray(32); SecureRandom().nextBytes(kb)
+            encryptionKey = SecretKeySpec(kb, "AES")
+            val encryptedKey = try { LuksEncryption.encryptWithMaster(android.util.Base64.encodeToString(kb, android.util.Base64.NO_WRAP)) } catch (_: Exception) { "" }
+            kb.fill(0)
+            if (encryptedKey.isNotEmpty()) File(logDir, "${logFile!!.name}.key").writeText(encryptedKey)
+        }
         outputStream = FileOutputStream(logFile!!, true); isActive = true
         write("=== AeroSSH Session Log ===\nDate: $timestamp\nEncrypted: $encrypted\n===========================\n\n")
     }
@@ -34,7 +40,10 @@ class SessionLogger(private val context: Context) {
         val file = logFile ?: return null; val ef = File(context.cacheDir, "export_${file.nameWithoutExtension}.txt")
         return try {
             val kf = File(file.parent, "${file.name}.key")
-            val key = if (kf.exists()) { val kb = android.util.Base64.decode(kf.readText().trim(), android.util.Base64.NO_WRAP); SecretKeySpec(kb, "AES").also { kb.fill(0) } } else null
+            val key = if (kf.exists()) {
+                val decryptedKey = try { LuksEncryption.decryptWithMaster(kf.readText().trim()) } catch (_: Exception) { "" }
+                if (decryptedKey.isNotEmpty()) { val kb = android.util.Base64.decode(decryptedKey, android.util.Base64.NO_WRAP); SecretKeySpec(kb, "AES").also { kb.fill(0) } } else null
+            } else null
             ef.bufferedWriter().use { w -> file.readLines().forEach { line -> key?.let { try { w.write(String(SecurityManager.decrypt(line.trim(), it), Charsets.UTF_8)) } catch (_: Exception) { w.write("[encrypted]") } } ?: w.write(line); w.newLine() } }; ef
         } catch (_: Exception) { null }
     }

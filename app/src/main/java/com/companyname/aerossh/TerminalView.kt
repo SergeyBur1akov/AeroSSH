@@ -14,7 +14,7 @@ import kotlin.math.max
 import kotlin.math.min
 
 class TerminalView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0) : View(context, attrs, defStyleAttr) {
-    private val buffer = TerminalBuffer()
+    private val buffer = TerminalBuffer(maxLines = com.companyname.aerossh.ui.Prefs.getScrollback(context))
     private val ansiParser = AnsiParser(buffer)
     private val textPaint = Paint().apply { typeface = Typeface.MONOSPACE; textSize = 32f; isAntiAlias = true; color = TerminalBuffer.COLOR_DEFAULT_FG }
     private val bgPaint = Paint()
