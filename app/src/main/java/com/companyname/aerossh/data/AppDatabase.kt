@@ -3,6 +3,7 @@ package com.companyname.aerossh.data
 import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
+import androidx.room.RoomDatabase
 import com.companyname.aerossh.security.SecureStorage
 
 @Database(entities = [Server::class, SshKey::class], version = 2, exportSchema = false)
