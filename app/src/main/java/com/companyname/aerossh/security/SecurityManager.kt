@@ -9,8 +9,8 @@ import javax.crypto.SecretKey
 import java.io.File
 
 object SecurityManager {
-    fun secureZero(array: ByteArray) { array.fill(0) }
-    fun secureZeroChars(array: CharArray) { array.fill('\u0000') }
+    fun secureZero(array: ByteArray) { array.fill(0); val dummy = array[0]; if (dummy != 0.toByte()) throw IllegalStateException("zeroing failed") }
+    fun secureZeroChars(array: CharArray) { array.fill('\u0000'); val dummy = array[0]; if (dummy != '\u0000') throw IllegalStateException("zeroing failed") }
 
     private const val GCM_TAG_LENGTH = 128; private const val GCM_IV_LENGTH = 12
 

@@ -20,6 +20,7 @@ class SessionLogger(private val context: Context) {
         val logDir = File(context.filesDir, "logs"); logDir.mkdirs()
         logFile = File(logDir, "session_${sessionId}_$timestamp.aeslog")
         if (encrypted) {
+            if (!LuksEncryption.isVaultUnlocked()) { isActive = false; return }
             val kb = ByteArray(32); SecureRandom().nextBytes(kb)
             encryptionKey = SecretKeySpec(kb, "AES")
             val encryptedKey = try { LuksEncryption.encryptWithMaster(android.util.Base64.encodeToString(kb, android.util.Base64.NO_WRAP)) } catch (_: Exception) { "" }

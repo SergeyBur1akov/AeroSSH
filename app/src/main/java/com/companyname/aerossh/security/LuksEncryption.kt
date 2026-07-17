@@ -49,7 +49,7 @@ object LuksEncryption {
     fun wipeVault(context: Context) { try { getSecurePrefs(context).edit().clear().apply() } catch (_: Exception) {}; masterKey = null }
 
     fun encryptWithMaster(plainText: String): String { val k = masterKey ?: throw IllegalStateException("Vault locked"); return encryptString(plainText, k) }
-    fun decryptWithMaster(encoded: String): String { val k = masterKey ?: throw IllegalStateException("Vault locked"); return try { decryptString(encoded, k) } catch (_: Exception) { "" } }
+    fun decryptWithMaster(encoded: String): String { val k = masterKey ?: throw IllegalStateException("Vault locked"); return try { decryptString(encoded, k) } catch (e: Exception) { android.util.Log.e("LuksEncryption", "Decryption failed - possible tampering: ${e.javaClass.simpleName}"); "" } }
     fun encryptBytesWithMaster(data: ByteArray): ByteArray = encrypt(data, masterKey ?: throw IllegalStateException("Vault locked"))
     fun decryptBytesWithMaster(data: ByteArray): ByteArray = decrypt(data, masterKey ?: throw IllegalStateException("Vault locked"))
 }

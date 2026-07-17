@@ -14,7 +14,7 @@ abstract class AppDatabase : RoomDatabase() {
         @Volatile private var INSTANCE: AppDatabase? = null
         fun get(context: Context): AppDatabase = INSTANCE ?: synchronized(this) {
             INSTANCE ?: run { SecureStorage.init(context); val pass = SecureStorage.getDatabasePassphrase(context)
-                Room.databaseBuilder(context.applicationContext, AppDatabase::class.java, "aerossh.db").openHelperFactory(net.sqlcipher.database.SupportFactory(pass)).fallbackToDestructiveMigration().build().also { INSTANCE = it } }
+                Room.databaseBuilder(context.applicationContext, AppDatabase::class.java, "aerossh.db").openHelperFactory(net.sqlcipher.database.SupportFactory(pass)).build().also { INSTANCE = it } }
         }
     }
 }

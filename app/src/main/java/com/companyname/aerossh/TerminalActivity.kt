@@ -16,6 +16,7 @@ import com.companyname.aerossh.databinding.ActivityTerminalBinding
 import com.companyname.aerossh.security.LuksEncryption
 import com.companyname.aerossh.security.SecurityManager
 import com.companyname.aerossh.security.VaultLockManager
+import com.companyname.aerossh.security.VaultLockManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -25,6 +26,7 @@ class TerminalActivity : AppCompatActivity() {
     data class Session(val id: Int, val host: String, val port: Int, val user: String, val pass: CharArray, var ssh: SshService? = null, var label: String = "", var isActive: Boolean = false) { override fun equals(other: Any?) = this === other; override fun hashCode() = id }
     private val sessions = mutableListOf<Session>(); private var activeSessionId = 0; private var nextSessionId = 1
     private val commandHistory = mutableListOf<String>(); private var historyIndex = -1
+    private val onVaultLock: () -> Unit = { sessions.forEach { it.ssh?.close(); it.pass.fill('\u0000') }; sessions.clear(); runOnUiThread { finish() } }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,6 +34,7 @@ class TerminalActivity : AppCompatActivity() {
         com.companyname.aerossh.security.SecurityManager.preventScreenshots(this)
         binding = ActivityTerminalBinding.inflate(layoutInflater); setContentView(binding.root)
         SecurityManager.setupClipboardAutoClear(this, 30_000)
+        VaultLockManager.addLockListener(onVaultLock)
         setupTopBar(); setupInput(); setupSpecialKeys(); setupSymbolKeys(); setupTerminal()
         val host = intent.getStringExtra(EXTRA_HOST) ?: run { finish(); return }; val port = intent.getIntExtra(EXTRA_PORT, 22); val user = intent.getStringExtra(EXTRA_USER) ?: run { finish(); return }
         val encPass = intent.getStringExtra(EXTRA_PASS) ?: ""; val pass = try { LuksEncryption.decryptWithMaster(encPass).toCharArray() } catch (_: Exception) { CharArray(0) }
@@ -96,7 +99,7 @@ class TerminalActivity : AppCompatActivity() {
 
     override fun onResume() { super.onResume(); VaultLockManager.onActivityResumed(this) }
     override fun onStop() { super.onStop(); VaultLockManager.onActivityStopped(this) }
-    override fun onDestroy() { super.onDestroy(); sessions.forEach { it.ssh?.close(); it.pass.fill('\u0000') }; sessions.clear() }
+    override fun onDestroy() { super.onDestroy(); VaultLockManager.removeLockListener(onVaultLock); sessions.forEach { it.ssh?.close(); it.pass.fill('\u0000') }; sessions.clear() }
 
     companion object { const val EXTRA_HOST = "host"; const val EXTRA_PORT = "port"; const val EXTRA_USER = "user"; const val EXTRA_PASS = "pass"
         fun start(context: Context, host: String, port: Int, user: String, pass: String) { val ep = try { LuksEncryption.encryptWithMaster(pass) } catch (_: Exception) { return }; context.startActivity(Intent(context, TerminalActivity::class.java).apply { putExtra(EXTRA_HOST, host); putExtra(EXTRA_PORT, port); putExtra(EXTRA_USER, user); putExtra(EXTRA_PASS, ep) }) }

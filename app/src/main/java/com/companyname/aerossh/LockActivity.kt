@@ -48,7 +48,7 @@ class LockActivity : AppCompatActivity() {
             val confirm = binding.confirmInput.text?.toString() ?: ""
             if (password != confirm) { Toast.makeText(this, "Passwords don't match", Toast.LENGTH_SHORT).show(); return }
             lifecycleScope.launch { binding.btnAction.isEnabled = false; binding.btnAction.text = "Encrypting..."; delay(100)
-                try { LuksEncryption.setupVault(this@LockActivity, password); showDecryptAnimation() } catch (e: Exception) { binding.btnAction.isEnabled = true; binding.btnAction.text = "Create Vault"; Toast.makeText(this@LockActivity, "Error: ${e.message}", Toast.LENGTH_SHORT).show() }
+                try { LuksEncryption.setupVault(this@LockActivity, password); showDecryptAnimation() } catch (e: Exception) { binding.btnAction.isEnabled = true; binding.btnAction.text = "Create Vault"; Toast.makeText(this@LockActivity, "Vault setup failed", Toast.LENGTH_SHORT).show() }
             }
         } else {
             if (password.isEmpty()) { binding.passwordInput.error = "Required"; return }
